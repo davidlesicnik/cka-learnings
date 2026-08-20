@@ -221,12 +221,4 @@ All nodes show `NotReady` because there's no **CNI (Container Network Interface)
 - Setting up routes so pods on different nodes can reach each other
 - Creating virtual network interfaces for each pod
 
-Common choices:
-
-| CNI Plugin | Notes |
-|------------|-------|
-| **Flannel** | Simple, uses VXLAN overlay. Good for learning |
-| **Calico** | More features (network policies, BGP). Production-grade |
-| **Cilium** | eBPF-based, high performance. Growing in popularity |
-
-Once a CNI is installed, all nodes transition to `Ready` and pods can be scheduled.
+This is covered in another doc.
