@@ -213,7 +213,7 @@ kubectl label node k8s-worker2 node-role.kubernetes.io/worker=
 
 ---
 
-## 5. Next Steps
+## 5. CNI
 
 All nodes show `NotReady` because there's no **CNI (Container Network Interface)** plugin installed. The CNI plugin is responsible for:
 
@@ -221,4 +221,14 @@ All nodes show `NotReady` because there's no **CNI (Container Network Interface)
 - Setting up routes so pods on different nodes can reach each other
 - Creating virtual network interfaces for each pod
 
-This is covered in another doc.
+For this example we'll install Flannerl. Run this on the controlplane node
+
+kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+
+Give it a minute, then check the node status
+
+root@k8s-cp1:~# kubectl get nodes
+NAME          STATUS   ROLES           AGE    VERSION
+k8s-cp1       Ready    control-plane   117m   v1.34.10
+k8s-worker1   Ready    <none>          111m   v1.34.10
+k8s-worker2   Ready    <none>          111m   v1.34.10
