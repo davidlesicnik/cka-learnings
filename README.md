@@ -12,3 +12,5 @@ The base content of each document is written by me as I work through the topics 
 - [etcd Backup & Restore](04-etcd-backup-restore.md) — Backing up and restoring the cluster database
 - [RBAC: Roles & RoleBindings](05-rbac-role-rolebindings.md) — Namespace-scoped permissions with ServiceAccounts
 - [RBAC: ClusterRoles](06-rbac-clusterrole.md) — Cluster-wide permissions and scoping ClusterRoles with RoleBindings
+- [Network Policies](07-network-policies.md) — Restricting pod-to-pod traffic with deny-all and allow rules
+- [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed

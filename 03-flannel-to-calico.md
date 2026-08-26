@@ -163,3 +163,17 @@ k8s-worker2   Ready    <none>          6h31m   v1.36.3
 ```
 
 All `Ready` — Calico is handling pod networking and the cluster is healthy.
+
+---
+
+## Post-Swap: Restart Pre-Existing Pods
+
+Pods that were running before the CNI swap still have stale IPs and network interfaces assigned by Flannel. Calico only assigns new networking to newly created pods.
+
+At minimum, restart CoreDNS — if DNS is broken, the whole cluster appears broken:
+
+```bash
+kubectl delete pod -n kube-system -l k8s-app=kube-dns
+```
+
+This was discovered later when CoreDNS entered CrashLoopBackOff with `no route to host` errors pointing at the Kubernetes API service. Full details in [99-troubleshooting](99-troubleshooting.md#coredns-crashloopbackoff-after-cni-swap).
