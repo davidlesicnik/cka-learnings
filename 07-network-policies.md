@@ -102,12 +102,76 @@ Create a namespace and three pods to test default cluster behavior:
 kubectl create namespace netpol-test
 
 kubectl run web --image=nginx --namespace=netpol-test --labels="app=web"
+kubectl expose pod web -n netpol-test --port=80 --name=web
 kubectl run client --image=busybox --namespace=netpol-test --labels="role=client" --command -- sleep 3600
 kubectl run other-client --image=busybox --namespace=netpol-test --labels="role=other" --command -- sleep 3600
 ```
 
-Expose the web pod's HTTP server via a Service:
+Test unrestricted traffic — this returns the nginx welcome page:
 
 ```bash
-kubectl expose pod web -n netpol-test --port=80 --name=web
+kubectl exec -n netpol-test client -- wget -qO- --timeout=2 web
 ```
+
+---
+
+## Deny-All Foundation
+
+Lock down all ingress to the namespace. Create `default-deny-ingress.yaml`:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: netpol-test
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+```
+
+`podSelector: {}` with no `ingress:` rules = select all pods, allow nothing in.
+
+Apply it:
+
+```bash
+kubectl apply -f default-deny-ingress.yaml
+```
+
+Same wget now times out — access is blocked:
+
+```bash
+kubectl exec -n netpol-test client -- wget -qO- --timeout=2 web
+# wget: download timed out
+# command terminated with exit code 1
+```
+
+---
+
+## Allowing Specific Traffic
+
+Now allow only the `client` pod to reach the `web` pod. Create `allow-client-to-web.yaml`:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-client-to-web
+  namespace: netpol-test
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          role: client
+```
+
+Reading the manifest: `podSelector` targets pods with `app=web`. The `ingress.from` rule allows traffic from pods with `role=client`. This is why we defined labels during pod creation (`--labels="role=client"`) — NetworkPolicies select pods entirely through labels.
+
+Once applied, the `client` pod (label `role=client`) can reach `web`, but `other-client` (label `role=other`) cannot.
