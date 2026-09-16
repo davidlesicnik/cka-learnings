@@ -20,4 +20,5 @@ The base content of each document is written by me as I work through the topics 
 - [Deployments](12-deployments.md) — Rolling updates, rollbacks, and scaling strategies
 - [DaemonSets](13-daemon-set.md) — Running one pod per node for infrastructure agents
 - [StatefulSets](14-stateful-set.md) — Stable pod identity, ordered scaling, and per-pod storage
+- [Resource Requests & Limits](15-resource-limits-requests.md) — CPU/memory guarantees, caps, QoS classes, and OOM kills
 - [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed
