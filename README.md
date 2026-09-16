@@ -13,4 +13,11 @@ The base content of each document is written by me as I work through the topics 
 - [RBAC: Roles & RoleBindings](05-rbac-role-rolebindings.md) — Namespace-scoped permissions with ServiceAccounts
 - [RBAC: ClusterRoles](06-rbac-clusterrole.md) — Cluster-wide permissions and scoping ClusterRoles with RoleBindings
 - [Network Policies](07-network-policies.md) — Restricting pod-to-pod traffic with deny-all and allow rules
+- [Service Types](08-network-service-types.md) — ClusterIP, NodePort, LoadBalancer, and ExternalName
+- [Ingress](09-ingress.md) — HTTP routing with Traefik as the ingress controller
+- [Storage: PVs & PVCs](10-storage.md) — Persistent Volumes, Claims, and mounting into pods
+- [Storage Classes](11-storage-classes.md) — Dynamic provisioning with local-path-provisioner
+- [Deployments](12-deployments.md) — Rolling updates, rollbacks, and scaling strategies
+- [DaemonSets](13-daemon-set.md) — Running one pod per node for infrastructure agents
+- [StatefulSets](14-stateful-set.md) — Stable pod identity, ordered scaling, and per-pod storage
 - [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed
