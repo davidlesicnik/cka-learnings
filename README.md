@@ -23,4 +23,6 @@ The base content of each document is written by me as I work through the topics 
 - [Resource Requests & Limits](15-resource-limits-requests.md) — CPU/memory guarantees, caps, QoS classes, and OOM kills
 - [Affinities](16-affinities.md) — Node affinity, pod affinity/anti-affinity, and enforcement levels
 - [Taints and Tolerations](17-taints-tolerations.md) — Repelling pods from nodes and bypassing taints with tolerations
+- [ConfigMaps and Secrets](18-configmap-secret-md) — Injecting config and sensitive data via env vars and volume mounts
+- [HPA](19-hpa.md) — Automatic replica scaling based on CPU/memory via metrics-server
 - [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed
