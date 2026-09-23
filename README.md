@@ -28,4 +28,5 @@ The base content of each document is written by me as I work through the topics 
 - [Jobs and CronJobs](20-jobs-cronjobs.md) — Run-to-completion workloads and scheduled jobs
 - [Helm and Kustomize](21-helm-kustomize.md) — Package management with Helm and environment overlays with Kustomize
 - [Gateway API](22-gatewayapi.md) — Successor to Ingress with split ownership across GatewayClass, Gateway, and HTTPRoute
+- [Troubleshooting Drills Part 1](23-troubleshooting-drills-1.md) — Bad image tag, service selector mismatch
 - [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed
