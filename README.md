@@ -25,4 +25,5 @@ The base content of each document is written by me as I work through the topics 
 - [Taints and Tolerations](17-taints-tolerations.md) — Repelling pods from nodes and bypassing taints with tolerations
 - [ConfigMaps and Secrets](18-configmap-secret-md) — Injecting config and sensitive data via env vars and volume mounts
 - [HPA](19-hpa.md) — Automatic replica scaling based on CPU/memory via metrics-server
+- [Jobs and CronJobs](20-jobs-cronjobs.md) — Run-to-completion workloads and scheduled jobs
 - [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed
