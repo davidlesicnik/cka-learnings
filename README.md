@@ -27,4 +27,5 @@ The base content of each document is written by me as I work through the topics 
 - [HPA](19-hpa.md) — Automatic replica scaling based on CPU/memory via metrics-server
 - [Jobs and CronJobs](20-jobs-cronjobs.md) — Run-to-completion workloads and scheduled jobs
 - [Helm and Kustomize](21-helm-kustomize.md) — Package management with Helm and environment overlays with Kustomize
+- [Gateway API](22-gatewayapi.md) — Successor to Ingress with split ownership across GatewayClass, Gateway, and HTTPRoute
 - [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed
