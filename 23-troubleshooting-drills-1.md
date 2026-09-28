@@ -346,3 +346,132 @@ k8s-worker2   Ready    <none>          39d   v1.36.3
 ### Key takeaway
 
 When `kubectl` is dead, the diagnostic path is: **`/var/log/pods/`** for static pod logs, and **`/etc/kubernetes/manifests/`** for static pod config. These are always available on the node regardless of API server state. Cross-reference broken config against the other component manifests (e.g. etcd manifest) to find the mismatch.
+
+
+## Drill 5: NetworkPolicy Blocking Traffic
+
+As covered in [Network Policies](07-network-policies.md), a mismatched label selector silently drops traffic with no error — it just times out.
+
+### Setup
+
+Create a baseline and verify it works:
+
+```bash
+kubectl create deployment np-web --image=nginx:alpine
+kubectl expose deployment np-web --port=80
+kubectl run np-client --image=busybox --restart=Never --labels="role=client" -- sleep 3600
+sleep 3
+kubectl exec np-client -- wget -qT 3 -O- np-web
+```
+
+nginx welcome page returns — baseline works. Now break it.
+
+Create `np-web-policy.yaml`:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-web-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: np-web
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              role: frontend
+      ports:
+        - port: 80
+```
+
+The client was created with `role=client`, but the policy allows `role=frontend` — deliberate mismatch.
+
+```bash
+kubectl apply -f np-web-policy.yaml
+```
+
+### Symptoms
+
+```bash
+kubectl exec np-client -- wget -qT 3 -O- np-web
+```
+
+```
+wget: download timed out
+```
+
+Timeout, not connection refused — characteristic of a NetworkPolicy drop (packet silently discarded, no RST).
+
+### Diagnosis
+
+First rule out a service/endpoint issue (same as drill 2):
+
+```bash
+kubectl get endpointslice
+```
+
+```
+NAME           ADDRESSTYPE   PORTS   ENDPOINTS       AGE
+np-web-p9qb8   IPv4          80      10.244.194.78   3m25s
+```
+
+Endpoint is healthy. Check for NetworkPolicies:
+
+```bash
+kubectl get netpol
+```
+
+```
+NAME            POD-SELECTOR   AGE
+np-web-policy   app=np-web     2m5s
+```
+
+A policy exists. Describe it:
+
+```bash
+kubectl describe netpol np-web-policy
+```
+
+```
+PodSelector:     app=np-web
+Allowing ingress traffic:
+  To Port: 80/TCP
+  From:
+    PodSelector: role=frontend
+```
+
+Two selectors to verify: `app=np-web` (server) and `role=frontend` (client). Check actual pod labels:
+
+```bash
+kubectl get pods --show-labels
+```
+
+```
+NAME                      READY   STATUS    AGE     LABELS
+np-client                 1/1     Running   4m28s   role=client
+np-web-6bdb86d96d-th7mg   1/1     Running   4m28s   app=np-web,pod-template-hash=6bdb86d96d
+```
+
+`app=np-web` matches the server. `role=frontend` does not match the client (`role=client`). Traffic blocked.
+
+### Fix
+
+Two options:
+
+**Option 1** — relabel the pod to match the policy:
+
+```bash
+kubectl label pod np-client role=frontend --overwrite
+```
+
+**Option 2** — fix the policy to match the pod's actual label (`role=client`), then re-apply.
+
+Either way, `kubectl exec np-client -- wget -qT 3 -O- np-web` returns the nginx page.
+
+### Key takeaway
+
+Timeout (not connection refused) = likely a NetworkPolicy drop. Diagnosis order: confirm endpoint is healthy → check `kubectl get netpol` → describe the policy → compare both pod selectors (`podSelector` on the policy target AND the `from.podSelector`) against actual pod labels with `--show-labels`. Also check `namespaceSelector` if pods are in different namespaces.
