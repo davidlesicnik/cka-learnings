@@ -123,3 +123,112 @@ crash-demo-ff8f484b6-mm2x5   1/1     Running   0          12s
 ### Key takeaway
 
 CrashLoopBackOff diagnostic order: `kubectl get pods` → `kubectl describe pod` (exit code) → act on the exit code → `kubectl logs` (or `--previous`). The exit code tells you which direction to look before you even open the logs.
+
+## Drill 7: Pod Stuck in Pending
+
+`Pending` means the scheduler can't find a node to place the pod on. Common causes: insufficient resources, unsatisfied node affinity, untolerated taint, or no PV available. Here we trigger it with requests that exceed node capacity.
+
+### Setup
+
+Create `pending-demo.yaml` with requests that no node can satisfy (64Gi RAM):
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pending-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pending-demo
+  template:
+    metadata:
+      labels:
+        app: pending-demo
+    spec:
+      containers:
+        - name: app
+          image: nginx:alpine
+          resources:
+            requests:
+              cpu: "2"
+              memory: 64Gi
+```
+
+```bash
+kubectl apply -f pending-demo.yaml
+```
+
+### Symptoms
+
+```bash
+kubectl get deployment pending-demo
+```
+
+```
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+pending-demo   0/1     1            0           103s
+```
+
+```bash
+kubectl get pods
+```
+
+```
+NAME                            READY   STATUS    RESTARTS   AGE
+pending-demo-5d8f6f85d5-lftkt   0/1     Pending   0          117s
+```
+
+### Diagnosis
+
+```bash
+kubectl describe pod pending-demo-5d8f6f85d5-lftkt
+```
+
+```
+Events:
+  Warning  FailedScheduling  36s (x4 over 2m39s)  default-scheduler  0/3 nodes are available: 1 Insufficient cpu, 1 node(s) had untolerated taint(s), 2 Insufficient memory.
+```
+
+The scheduler tells you exactly why each node was rejected:
+- `1 node(s) had untolerated taint(s)` — the control plane node, expected
+- `2 Insufficient memory` — both worker nodes don't have 64Gi free
+
+Confirm actual allocatable resources on a worker:
+
+```bash
+kubectl describe node k8s-worker1 | grep -A 8 Allocatable
+```
+
+```
+Allocatable:
+  cpu:                2
+  memory:             1911032Ki
+  pods:               110
+```
+
+`1911032Ki` ≈ 1.8Gi. Pod requests 64Gi — no match.
+
+### Fix
+
+Reduce the requests to fit within what the nodes actually have:
+
+```yaml
+resources:
+  requests:
+    cpu: "500m"
+    memory: 128Mi
+```
+
+### Key takeaway
+
+`Pending` diagnostic path: `kubectl describe pod` → read the `FailedScheduling` event — the scheduler lists every node and why it was rejected. This one message tells you whether it's a resource problem, a taint problem, an affinity problem, or something else entirely.
+
+Other common `Pending` causes seen in `FailedScheduling` events:
+
+| Event message | Cause | Fix |
+|---------------|-------|-----|
+| No events at all | Scheduler isn't running | `kubectl -n kube-system get pods \| grep scheduler` — see drill 4 |
+| `unbound immediate PersistentVolumeClaims` | PVC not bound | Fix the PV or StorageClass |
+| `didn't match Pod's node affinity/selector` | No node satisfies the affinity rule | Check nodeSelector / affinity constraints vs node labels |
