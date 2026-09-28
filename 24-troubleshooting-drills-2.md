@@ -232,3 +232,102 @@ Other common `Pending` causes seen in `FailedScheduling` events:
 | No events at all | Scheduler isn't running | `kubectl -n kube-system get pods \| grep scheduler` — see drill 4 |
 | `unbound immediate PersistentVolumeClaims` | PVC not bound | Fix the PV or StorageClass |
 | `didn't match Pod's node affinity/selector` | No node satisfies the affinity rule | Check nodeSelector / affinity constraints vs node labels |
+
+## Drill 8: PVC Stuck in Pending
+
+A PVC stays `Pending` when it can't be bound — either the StorageClass doesn't exist, no matching PV is available, or (with `WaitForFirstConsumer`) no pod has claimed it yet. Here we trigger it with a StorageClass typo.
+
+### Setup
+
+Create `pvc-broken.yaml`:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-broken
+spec:
+  storageClassName: local-pat
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+```bash
+kubectl apply -f pvc-broken.yaml
+```
+
+### Symptoms
+
+```bash
+kubectl get pvc
+```
+
+```
+NAME         STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+pvc-broken   Pending                                      local-pat      24s
+```
+
+### Diagnosis
+
+```bash
+kubectl describe pvc pvc-broken
+```
+
+```
+Events:
+  Warning  ProvisioningFailed  8s (x4 over 52s)  persistentvolume-controller  storageclass.storage.k8s.io "local-pat" not found
+```
+
+StorageClass `local-pat` doesn't exist. Check what's actually available:
+
+```bash
+kubectl get sc
+```
+
+```
+NAME         PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+local-path   rancher.io/local-path   Delete          WaitForFirstConsumer   false                  14d
+```
+
+Typo: `local-pat` should be `local-path`.
+
+### Fix
+
+`storageClassName` is immutable — can't patch a PVC's spec after creation. Delete and recreate:
+
+```bash
+kubectl delete pvc pvc-broken
+# fix the typo in pvc-broken.yaml
+kubectl apply -f pvc-broken.yaml
+```
+
+```bash
+kubectl get pvc
+```
+
+```
+NAME         STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+pvc-broken   Pending                                      local-path     5s
+```
+
+Still `Pending` — this is expected. The StorageClass uses `WaitForFirstConsumer`, meaning it won't provision until a pod actually mounts the PVC. Attach a pod:
+
+```bash
+kubectl run pvc-test --image=nginx:alpine --overrides='{"spec":{"volumes":[{"name":"d","persistentVolumeClaim":{"claimName":"pvc-broken"}}],"containers":[{"name":"pvc-test","image":"nginx:alpine","volumeMounts":[{"name":"d","mountPath":"/data"}]}]}}'
+```
+
+```bash
+kubectl get pvc
+```
+
+```
+NAME         STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+pvc-broken   Bound    pvc-964e12de-f572-42c2-b541-c02c451413a7   1Gi        RWO            local-path     86s
+```
+
+### Key takeaway
+
+PVC `Pending` diagnostic: `kubectl describe pvc` → check Events. Two distinct causes need different fixes: `StorageClass not found` = name typo or missing SC; `Pending` with no events after fixing the SC = `WaitForFirstConsumer` waiting for a pod to trigger provisioning.
