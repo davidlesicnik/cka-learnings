@@ -6,6 +6,7 @@ The base content of each document is written by me as I work through the topics 
 
 ## Documents
 
+- [Exam Shortcuts](00-exam-shortcuts.md) — `--dry-run=client -o yaml` quick reference for generating manifests
 - [Cluster Setup](01-cluster-setup.md) — Creating a 3-node cluster with kubeadm on multipass VMs
 - [Cluster Upgrade](02-cluster-upgrade.md) — Upgrading Kubernetes one minor version at a time
 - [Flannel to Calico](03-flannel-to-calico.md) — Replacing the CNI plugin for NetworkPolicy support
