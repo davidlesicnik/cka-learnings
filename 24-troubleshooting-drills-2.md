@@ -331,3 +331,166 @@ pvc-broken   Bound    pvc-964e12de-f572-42c2-b541-c02c451413a7   1Gi        RWO 
 ### Key takeaway
 
 PVC `Pending` diagnostic: `kubectl describe pvc` → check Events. Two distinct causes need different fixes: `StorageClass not found` = name typo or missing SC; `Pending` with no events after fixing the SC = `WaitForFirstConsumer` waiting for a pod to trigger provisioning.
+
+## Drill 9: Node NotReady
+
+Drill 3 covered `NotReady` from the node's perspective (journalctl). This drill focuses on reading node health from the **cluster side** — the `Conditions` block in `kubectl describe node`.
+
+### Setup
+
+Stop kubelet on a worker node:
+
+```bash
+multipass shell k8s-worker2
+sudo systemctl stop kubelet
+```
+
+### Symptoms
+
+```bash
+kubectl get nodes
+```
+
+```
+NAME          STATUS     ROLES           AGE   VERSION
+k8s-cp1       Ready      control-plane   40d   v1.36.3
+k8s-worker1   Ready      <none>          40d   v1.36.3
+k8s-worker2   NotReady   <none>          40d   v1.36.3
+```
+
+### Diagnosis
+
+```bash
+kubectl describe node k8s-worker2
+```
+
+Focus on the `Conditions` block:
+
+```
+Type                 Status    LastHeartbeatTime                 Reason              Message
+----                 ------    -----------------                 ------              -------
+NetworkUnavailable   False     Mon, 28 Sep 2026 10:21:58 +0200   CalicoIsUp          Calico is running on this node
+MemoryPressure       Unknown   Tue, 29 Sep 2026 12:39:10 +0200   NodeStatusUnknown   Kubelet stopped posting node status.
+DiskPressure         Unknown   Tue, 29 Sep 2026 12:39:10 +0200   NodeStatusUnknown   Kubelet stopped posting node status.
+PIDPressure          Unknown   Tue, 29 Sep 2026 12:39:10 +0200   NodeStatusUnknown   Kubelet stopped posting node status.
+Ready                Unknown   Tue, 29 Sep 2026 12:39:10 +0200   NodeStatusUnknown   Kubelet stopped posting node status.
+```
+
+All conditions are `Unknown` except `NetworkUnavailable` (which is `False` = healthy). `Unknown` means the control plane stopped receiving heartbeats from the node — the kubelet isn't reporting in. `LastHeartbeatTime` shows exactly when the cluster last heard from it.
+
+**Reading the Conditions block:**
+
+| Condition | Healthy state | Meaning when bad |
+|-----------|--------------|-----------------|
+| `Ready` | `True` | Node is schedulable and healthy |
+| `MemoryPressure` | `False` | Node is running low on memory |
+| `DiskPressure` | `False` | Node is running low on disk |
+| `PIDPressure` | `False` | Too many processes running on node |
+| `NetworkUnavailable` | `False` | CNI not configured (True = problem) |
+
+`Unknown` on all of them simultaneously = kubelet stopped talking, not individual resource pressure.
+
+### Fix
+
+```bash
+sudo systemctl start kubelet
+```
+
+Conditions return to healthy:
+
+```
+Type                 Status  Reason                       Message
+----                 ------  ------                       -------
+NetworkUnavailable   False   CalicoIsUp                   Calico is running on this node
+MemoryPressure       False   KubeletHasSufficientMemory   kubelet has sufficient memory available
+DiskPressure         False   KubeletHasNoDiskPressure     kubelet has no disk pressure
+PIDPressure          False   KubeletHasSufficientPID      kubelet has sufficient PID available
+Ready                True    KubeletReady                 kubelet is posting ready status
+```
+
+### Key takeaway
+
+`kubectl describe node` → `Conditions` block is the cluster-side health view. All `Unknown` at once = communication loss (kubelet down or network issue). Individual condition bad = actual resource pressure on that node. `LastHeartbeatTime` tells you when it was last healthy.
+
+## Drill 10: DNS Resolution Failure
+
+DNS failures inside a cluster are silent — pods can still reach each other by IP, but service names stop resolving. This simulates CoreDNS being down by scaling it to zero.
+
+### Setup
+
+```bash
+kubectl -n kube-system scale deployment coredns --replicas=0
+```
+
+Note: service ClusterIPs continue working — they're kernel-level iptables rules, not DNS-dependent.
+
+### Symptoms
+
+```bash
+kubectl run dns-test --image=busybox --restart=Never --rm -it -- nslookup kubernetes.default
+```
+
+```
+;; connection timed out; no servers could be reached
+```
+
+### Diagnosis
+
+Check CoreDNS deployment:
+
+```bash
+kubectl get deployment -n kube-system coredns
+```
+
+```
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+coredns   0/0     0            0           40d
+```
+
+`0/0` — scaled to zero. If this were a real crash you'd see `0/2` (running/desired mismatch). Check the `kube-dns` Service is still healthy:
+
+```bash
+kubectl -n kube-system get svc kube-dns
+```
+
+```
+NAME       TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)                  AGE
+kube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP,9153/TCP   40d
+```
+
+Verify a pod's DNS server points to it:
+
+```bash
+kubectl run tmp --image=busybox --restart=Never --rm -it -- cat /etc/resolv.conf
+```
+
+```
+nameserver 10.96.0.10
+```
+
+Matches. So the DNS server address is correct — the CoreDNS pods behind it just aren't running.
+
+If CoreDNS pods were running but crashing, next step would be:
+
+```bash
+kubectl -n kube-system logs -l k8s-app=kube-dns
+kubectl -n kube-system get cm coredns -o yaml  # check for bad Corefile edits
+```
+
+### Fix
+
+```bash
+kubectl -n kube-system scale deployment coredns --replicas=2
+```
+
+### Key takeaway
+
+DNS failure diagnostic: test with `nslookup` → check CoreDNS pods (`kubectl get deploy -n kube-system coredns`) → check `kube-dns` Service → check pod's `resolv.conf` matches. Work from the outside in.
+
+**Other common DNS failure modes:**
+
+| Symptom | Likely cause |
+|---------|-------------|
+| CoreDNS in `CrashLoopBackOff` | Bad Corefile — check the `coredns` ConfigMap |
+| Pods running, service has endpoints, but resolution fails | `dnsPolicy: Default` on the querying pod (uses node DNS, not cluster DNS), or NetworkPolicy blocking port 53 egress |
+| External names fail, internal names work | CoreDNS upstream `forward` config in the Corefile |
