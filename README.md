@@ -31,4 +31,5 @@ The base content of each document is written by me as I work through the topics 
 - [Gateway API](22-gatewayapi.md) — Successor to Ingress with split ownership across GatewayClass, Gateway, and HTTPRoute
 - [Troubleshooting Drills Part 1](23-troubleshooting-drills-1.md) — Bad image tag, service selector mismatch, broken kubelet, crashed kube-apiserver, NetworkPolicy label mismatch
 - [Troubleshooting Drills Part 2](24-troubleshooting-drills-2.md) — CrashLoopBackOff exit code triage, pod Pending, PVC Pending, node NotReady, CoreDNS down
+- [kubectl debug](25-kubectl-debug.md) — Ephemeral containers, node shell access, and copying crashing pods
 - [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed
