@@ -29,6 +29,12 @@ PID   USER     TIME  COMMAND
 
 nginx processes visible from inside the busybox debug container.
 
+**Cleanup caveat:** ephemeral containers are append-only. There's no `kubectl delete container`, no patch that removes an entry from `.spec.ephemeralContainers` — that field is explicitly append-only via its own API subresource. The only way to get rid of it is to delete the pod.
+
+For controller-managed pods (Deployment, StatefulSet), this is painless — delete the pod, the controller reschedules a clean replacement. For bare pods, deleting is destructive: the pod is gone entirely, not just the debug container.
+
+Exam implication: if a task says "debug this pod without disrupting it" and it's a bare pod rather than something controller-managed, `--copy-to` (Mode 3) is actually the less disruptive choice — it leaves the original completely untouched and just needs its own cleanup.
+
 ---
 
 ## Mode 2: Debug a Node Without SSH
