@@ -36,4 +36,5 @@ The base content of each document is written by me as I work through the topics 
 - [Init Containers](27-init-containers.md) — Sequential pre-start containers, status progression, and debugging init failures
 - [Sidecar Containers](28-sidecar-containers.md) — Long-running companion containers via `restartPolicy: Always` in initContainers
 - [Static Pods](29-static-pods.md) — Kubelet-managed pods, node hostname suffix tell, and why `kubectl edit` is silently ignored
+- [LimitRange](30-limit-range.md) — Namespace-scoped default injection and min/max bounds enforcement for container resources
 - [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed
