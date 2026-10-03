@@ -33,4 +33,5 @@ The base content of each document is written by me as I work through the topics 
 - [Troubleshooting Drills Part 2](24-troubleshooting-drills-2.md) — CrashLoopBackOff exit code triage, pod Pending, PVC Pending, node NotReady, CoreDNS down
 - [kubectl debug](25-kubectl-debug.md) — Ephemeral containers, node shell access, and copying crashing pods
 - [Certificate Management](26-k8s-certificate-management.md) — Checking cert expiry, manual renewal, and restarting components after renewal
+- [Init Containers](27-init-containers.md) — Sequential pre-start containers, status progression, and debugging init failures
 - [Troubleshooting](99-troubleshooting.md) — Real issues encountered along the way and how they were fixed
