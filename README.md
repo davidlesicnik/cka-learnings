@@ -4,6 +4,21 @@ Personal notes and walkthroughs as I progress through CKA (Certified Kubernetes 
 
 The base content of each document is written by me as I work through the topics hands-on. Formatting, structure, and additional explanations were added with help from Claude Code.
 
+## Exercises
+
+Hands-on drills with reference solutions, tips, and run notes:
+
+- [etcd Restore](exercises/01-etcd-restore.md) — Full backup-and-restore cycle with etcdutl
+- [RBAC](exercises/02-rbac.md) — Role, ClusterRole, and ServiceAccount bindings
+- [NetworkPolicy](exercises/03-networkpolicy.md) — Pick the least-permissive policy from four candidates
+- [Static Pod and Scheduling](exercises/04-static-pod-and-scheduling.md) — Static pod + forced control-plane scheduling
+- [PV, PVC, and Pod](exercises/05-pv-pvc-pod.md) — Create and bind a PersistentVolume, mount into a pod
+- [Fix Broken Service + HTTPRoute](exercises/06-service-gateway.md) — Diagnose empty endpoints, expose via Gateway API
+- [Helm](exercises/07-helm.md) — Add repo, install, upgrade, rollback, list across namespaces
+- [Kustomize](exercises/08-kustomize.md) — Overlay with namespace, namePrefix, replicas, image tag, ConfigMap generator
+- [Pods Unschedulable](exercises/09-pods-unschedulable.md) — No events on Pending pods → broken kube-scheduler static pod
+- [DNS Resolution Broken](exercises/10-dns-resolving.md) — cluster.local fails, external resolves → CoreDNS Corefile typo
+
 ## Documents
 
 - [Exam Shortcuts](00-exam-shortcuts.md) — `--dry-run=client -o yaml` quick reference for generating manifests
