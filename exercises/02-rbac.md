@@ -90,3 +90,9 @@ Used YAML instead of imperative commands. Bound to `kind: User` instead of `kind
 Also used `resources: ["deployment"]` (singular) and `apiGroup: rbac.authorization.k8s.io` on the subject — both wrong. The `--list` output not showing deployments was the signal the role wasn't working, but didn't catch it at the time.
 
 **Key lesson:** Use imperative commands — `kubectl create role` and `kubectl create rolebinding` handle the pluralization and apiGroup fields automatically, removing both bugs above.
+
+### Run 2 — 6 minutes
+
+Used `--help` on `kubectl create role` and `kubectl create rolebinding` — the example commands in the help output cover exactly the syntax needed. No docs page required.
+
+Main thing to watch: specify `-n <namespace>` on every command. Easy to forget and create the role in the wrong namespace.

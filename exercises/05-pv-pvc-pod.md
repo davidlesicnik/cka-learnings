@@ -116,3 +116,7 @@ cat /mnt/data/test.txt
 Used docs page "Configure a Pod to Use a PersistentVolume for Storage" — has all three manifests, just modify names and paths. Good page to know.
 
 Forgot hostPath is node-local — looked for the file on the control plane first, found nothing. Checked `kubectl get pod -o wide`, found pod on `k8s-worker1`, found the file there.
+
+### Run 2: 4 minutes 45.
+
+This time it went smooth. Copied and edited the manifests from the "Configure a Pod to Use a PersistentVolume for Storage" page, nothing special to mention.

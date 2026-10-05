@@ -115,3 +115,13 @@ grep staticPodPath /var/lib/kubelet/config.yaml
 Static pod: used `kubectl run pod static-web` (wrong — `pod` is the name, `static-web` becomes an arg). Had to manually remove the extra args from the generated YAML. 
 
 Second pod: couldn't remember the control plane taint key. Used `kubectl describe node k8s-cp1` to find it — correct approach, use this every time rather than guessing. Found the taint, used same label for nodeSelector.
+
+### Run 2 — 5 minutes
+
+Static pod: used `kubectl run --help` for syntax — ~1.5 minutes. Gotcha: copied the image and name from the example command instead of the exercise spec. Always substitute before running.
+
+Second pod: `--dry-run=client -o yaml` to generate the base, then added toleration and nodeSelector manually.
+- Toleration: "Taints and Tolerations" docs page has an example near the top — used `operator: Exists`
+- nodeSelector: "Assign Pods to Nodes" docs page has an example — same `Exists` operator pattern
+
+20 min → 5 min.

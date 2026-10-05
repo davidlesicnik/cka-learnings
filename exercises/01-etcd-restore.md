@@ -152,6 +152,10 @@ All subsequent `etcdctl` calls in that shell session will use v3 — no need to 
 
 **API server comes back slowly.** After moving the manifest back, it can take 60-90 seconds for etcd to start and the API server to reconnect. `kubectl get nodes` timing out doesn't mean something is wrong — wait it out, then check again.
 
+**`etcdctl` endpoint port is `2379`, not `2380`.** The docs near the backup section show `2380` — that's the peer port (etcd-to-etcd replication). The client port is `2379`. Always use `--endpoints=https://127.0.0.1:2379`.
+
+**`cd /etc/kubernetes/pki/etcd` before running `etcdctl`.** Then use `--cacert=ca.crt --cert=server.crt --key=server.key` — no full paths needed.
+
 ---
 
 ## Run Notes
@@ -178,3 +182,19 @@ Fix: updated `hostPath.path` in `etcd.yaml` from `/var/lib/etcd` → `/var/lib/e
 **Key lesson from this run:** Restoring the data is half the job. Pointing etcd at it is the other half. After restore, always check the `etcd-data` volume `hostPath` in the manifest before restarting.
 
 Also tried `etcdutl --data-dir . snapshot restore` initially — wrong syntax. Correct form is `etcdutl snapshot restore <file> --data-dir <path>`.
+
+
+### Run 2 — 7m40s (~1 min unnecessary troubleshooting)
+
+Improvements over run 1:
+- Exported `ETCDCTL_API=3` upfront — no friction on the snapshot command
+- `cd /etc/kubernetes/pki/etcd` first — avoided spelling out full cert paths on every command
+- Used `etcdctl member list` to get cert flag syntax right before attempting the snapshot
+
+Port gotcha: docs page near the backup section mentions port `2380` — tried it first, failed. Remembered 2380 is the peer port; client port is `2379`. Always use `2379` for `etcdctl`.
+
+Verified snapshot with `etcdutl snapshot status /opt/backup/etcd-snapshot.db --write-out=table` — confirmed healthy before restoring.
+
+Shut down etcd by moving its manifest out of `/etc/kubernetes/manifests/`, restored snapshot to `/opt/test/` (run 1 already used the exam path, and i wanted to use a different one), updated `hostPath` in `etcd.yaml`, moved manifest back.
+
+Wasted ~1 minute troubleshooting after the restore because etcd takes a few minutes to start — forgot about the startup delay. Nothing was wrong.

@@ -125,3 +125,13 @@ Chose `policy-1` — looked right at a glance. Missed that `namespaceSelector` a
 Correct answer was `policy-3`: AND combo + port filter + Ingress only.
 
 **Key lesson:** When scanning a policy, look at the `-` dashes in the `from:` block first. One dash = AND. Two dashes = OR. This one character is the difference between correct and wrong.
+
+### Run 2 — 2 minutes
+
+Kept the answer out of memory and used the elimination decision tree instead:
+
+- policy-1 vs policy-2: policy-2 has no `ports` block → all ports → eliminated
+- policy-1 vs policy-3: policy-1 has two `-` dashes (OR matching) → too permissive → eliminated
+- policy-3 vs policy-4: policy-4 includes `Egress` in `policyTypes` → affects egress → eliminated
+
+Answer: policy-3. Half the time of run 1.
