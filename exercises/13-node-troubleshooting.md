@@ -63,3 +63,8 @@ echo "kubelet" > /opt/answers/q11.txt
 
 ## Run Notes
 
+### Run 1 — 1m50s
+
+`kubectl get nodes` → worker1 NotReady. `kubectl describe node k8s-worker1` → all conditions `Unknown`, reason `NodeStatusUnknown: Kubelet stopped posting node status.` — kubelet dead.
+
+SSHed into worker1, `systemctl status kubelet` confirmed stopped. `systemctl start kubelet`, node back to Ready. Clean path.

@@ -19,6 +19,10 @@ Hands-on drills with reference solutions, tips, and run notes:
 - [Pods Unschedulable](exercises/09-pods-unschedulable.md) — No events on Pending pods → broken kube-scheduler static pod
 - [DNS Resolution Broken](exercises/10-dns-resolving.md) — cluster.local fails, external resolves → CoreDNS Corefile typo
 - [Init Container + Sidecar](exercises/11-init-sidecar.md) — seed init writes file, sidecar tails it, main container runs alongside
+- [Deployment Rollout](exercises/12-deployment-rollout.md) — Update image, check history, rollback, scale
+- [Node NotReady](exercises/13-node-troubleshooting.md) — All conditions Unknown → stopped kubelet on worker node
+- [ClusterRole Scoped with RoleBinding](exercises/14-clusterrole-scoping.md) — ClusterRole + RoleBinding to restrict to one namespace
+- [Job and CronJob](exercises/15-cronjob.md) — Job with retries, CronJob with history limits, manual trigger
 
 ## Documents
 

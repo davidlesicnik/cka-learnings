@@ -56,5 +56,8 @@ kubectl get deployment api -n prod -o jsonpath='{.spec.template.spec.containers[
 
 ---
 
-## Run Notes
+## Run Notes 
 
+### Run 1 — 1m30s
+
+Used `kubectl edit` for both the image change and replica scale instead of `set image` / `scale` — works but slower. Didn't know `rollout` syntax — `--help` gave it. Used `--to-revision=1` explicitly as the task required, though plain `undo` would have been equivalent here.

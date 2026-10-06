@@ -73,3 +73,6 @@ kubectl get job db-backup -n ops -o jsonpath='{.status.conditions[0].type}' > /o
 
 ## Run Notes
 
+### Run 1 — ~10 minutes
+
+Most syntax found in the docs. Manual trigger was the sticking point — forgot you use `kubectl create job <name> --from=cronjob/<name>`. Found it via `kubectl create job --help`.

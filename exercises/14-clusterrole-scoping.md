@@ -61,3 +61,6 @@ printf "allowed\ndenied\n" > /opt/answers/q12.txt
 
 ## Run Notes
 
+### Run 1 — 3m45s
+
+Straightforward. Used `kubectl create --help` for ClusterRole, ServiceAccount, and RoleBinding syntax, then `kubectl auth can-i --help` for the impersonation flag. No surprises.
