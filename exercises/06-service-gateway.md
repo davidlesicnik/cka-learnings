@@ -132,3 +132,11 @@ curl -H "Host: web.example.com" http://<node-ip>:<traefik-nodeport>/app
 Part 1: Found empty endpointslice → described service → saw `Selector: app=web-app` → described a pod → saw `Labels: app=web` → edited service. Clean diagnostic path.
 
 Part 2: Found Gateway API docs page, found HTTPRoute example, modified names and path. Fast because the structure was familiar from the main notes.
+
+### Run 2 — Part 1: 1m05s, Part 2: 1m15s
+
+Part 1: Knew to go straight to the service selector — no detour to the deployment. 3m18s → 1m05s.
+
+Part 2: Same flow, pulled HTTPRoute template from the Gateway API notes. No change from run 1.
+
+This exercise doesn't need further repetition.

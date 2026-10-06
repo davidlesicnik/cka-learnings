@@ -60,3 +60,7 @@ After rollback, `helm list -A` shows `REVISION: 3` — that's expected. Rollback
 No prior Helm workflow knowledge. Navigated entirely via `--help` on each subcommand.
 
 Typo'd `--set ReplicaCount=2` (capital R) — Helm accepted it silently but ignored it, pod count stayed at 1. Found correct casing with `helm show values`.
+
+### Run 2 — 2m30s
+
+All commands correct first try. `helm --help` (top-level) also shows examples — useful alongside the subcommand `--help`. 6 min → 2m30s.
