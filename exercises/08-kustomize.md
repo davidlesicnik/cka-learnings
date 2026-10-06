@@ -130,3 +130,12 @@ Used `bases:` instead of `resources:` for the base reference — got a deprecati
 Needed outside help to get the `kustomization.yaml` fields right (`replicas:`, `images:`, `configMapGenerator:`). These aren't intuitive from first principles — the docs page is the right reference.
 
 `kubectl kustomize .` in the overlay dir confirmed the output looked correct before applying.
+
+### Run 2 — 8 minutes
+
+Used `kubectl kustomize .` as a feedback loop throughout — after each field added, re-ran it to confirm the rendered output changed as expected. Verified base reference worked before adding anything else.
+
+Docs flow:
+- "Introducing Kustomize" blog post → `resources: - ../../base` syntax
+- "Declarative Management of Kubernetes Objects Using Kustomize" → `namespace:`, `namePrefix:`, `images:`, `configMapGenerator:` all findable on that page
+- `replicas:` field not found on the docs page — still needed outside help for that one

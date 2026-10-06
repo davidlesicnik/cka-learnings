@@ -18,6 +18,7 @@ Hands-on drills with reference solutions, tips, and run notes:
 - [Kustomize](exercises/08-kustomize.md) — Overlay with namespace, namePrefix, replicas, image tag, ConfigMap generator
 - [Pods Unschedulable](exercises/09-pods-unschedulable.md) — No events on Pending pods → broken kube-scheduler static pod
 - [DNS Resolution Broken](exercises/10-dns-resolving.md) — cluster.local fails, external resolves → CoreDNS Corefile typo
+- [Init Container + Sidecar](exercises/11-init-sidecar.md) — seed init writes file, sidecar tails it, main container runs alongside
 
 ## Documents
 

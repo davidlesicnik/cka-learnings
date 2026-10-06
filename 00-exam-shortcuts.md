@@ -45,6 +45,14 @@ spec:
   restartPolicy: Always
 ```
 
+### Kustomize — replicas (not in k8s docs, memorize this)
+
+```yaml
+replicas:
+  - name: <deployment-name>
+    count: <n>
+```
+
 ### Deployment
 
 ```bash
