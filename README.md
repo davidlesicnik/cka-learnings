@@ -35,6 +35,21 @@ Hands-on drills with reference solutions, tips, and run notes:
 - [HPA](exercises/20-hpa.md) — CPU-based autoscaling with min/max bounds
 - [Application Unreachable](exercises/21-app-unreachable.md) — Service selector mismatch + NetworkPolicy blocking, two faults in one
 
+## Killercoda Scenarios
+
+Scenarios from [Chad M. Crowell's CKA course](https://killercoda.com/chadmcrowell/course/cka) — done there, notes tracked here:
+
+- [Cluster Upgrade](killercoda/01-cluster-upgrade.md) — Control plane + worker upgrade with kubeadm
+- [Cordon and Drain](killercoda/02-cordon-drain.md) — Maintenance workflow, PodDisruptionBudgets
+- [Certificate PKI](killercoda/03-certificate-pki.md) — PKI directory, cert expiry, renewal with kubeadm certs
+- [Taints and Tolerations](killercoda/04-taints-tolerations.md) — Apply, remove taints; add tolerations to YAML
+- [Node Affinity](killercoda/05-node-affinity.md) — Required vs preferred, nodeSelector scheduling
+- [Troubleshoot Stuck PVC](killercoda/06-troubleshoot-stuck-pvc.md) — PVC stuck Pending diagnosis and fix
+- [Priority Class](killercoda/07-priority-class.md) — PriorityClass scheduling and preemption
+- [Broken Network Path](killercoda/08-broken-network-path.md) — Port misconfiguration between service and pod
+- [Kubelet SSH](killercoda/09-kubelet-ssh.md) — SSH into worker node, check and restart kubelet
+- [Kustomize](killercoda/10-kustomize.md) — Apply, common labels, configmap/secret, env overlay, patch image (5 scenarios)
+
 ## Documents
 
 - [Exam Shortcuts](00-exam-shortcuts.md) — `--dry-run=client -o yaml` quick reference for generating manifests
