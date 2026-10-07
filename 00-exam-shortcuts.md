@@ -45,6 +45,12 @@ spec:
   restartPolicy: Always
 ```
 
+### Ingress — test with fake Host header
+
+```bash
+curl -H "Host: web.local" http://<ingress-controller-ip>/path
+```
+
 ### Kustomize — replicas (not in k8s docs, memorize this)
 
 ```yaml

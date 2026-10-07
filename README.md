@@ -23,6 +23,17 @@ Hands-on drills with reference solutions, tips, and run notes:
 - [Node NotReady](exercises/13-node-troubleshooting.md) — All conditions Unknown → stopped kubelet on worker node
 - [ClusterRole Scoped with RoleBinding](exercises/14-clusterrole-scoping.md) — ClusterRole + RoleBinding to restrict to one namespace
 - [Job and CronJob](exercises/15-cronjob.md) — Job with retries, CronJob with history limits, manual trigger
+- [Pod Failure Triage](exercises/16-pod-failures.md) — CrashLoopBackOff, ImagePullBackOff, OOMKilled, Pending diagnosis
+- [ConfigMap and Secret](exercises/17-configmap-secret.md) — Create and inject as env vars and volume mount
+- [StorageClass Dynamic Provisioning](exercises/18-storageclass-dynamic.md) — StorageClass YAML, PVC, pod with WaitForFirstConsumer
+- [Ingress](exercises/19-ingress.md) — Path-based routing, ingressClassName, curl with Host header
+- [HPA](exercises/20-hpa.md) — Autoscale deployment on CPU utilization
+- [Pod Failure Triage](exercises/16-pod-failures.md) — CrashLoopBackOff, ImagePullBackOff, OOMKilled, Pending diagnosis
+- [ConfigMap and Secret](exercises/17-configmap-secret.md) — Inject config via env vars and volume mounts
+- [StorageClass and Dynamic Provisioning](exercises/18-storageclass-dynamic.md) — StorageClass, dynamic PVC, WaitForFirstConsumer
+- [Ingress](exercises/19-ingress.md) — Path-based routing to two backends with ingressClassName
+- [HPA](exercises/20-hpa.md) — CPU-based autoscaling with min/max bounds
+- [Application Unreachable](exercises/21-app-unreachable.md) — Service selector mismatch + NetworkPolicy blocking, two faults in one
 
 ## Documents
 
