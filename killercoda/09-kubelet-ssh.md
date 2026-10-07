@@ -8,4 +8,6 @@ Scenario: **Quick SSH: Check and Restart kubelet** + **Kubelet Status** + **Linu
 
 ## Run Notes
 
-### Run 1 —
+### Run 1 — sub 2m
+
+Pure lab/command familiarity — ssh, `systemctl status/start kubelet`, redirect output to a file, `systemctl list-unit-files | grep kube`. No new content.
